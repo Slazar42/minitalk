@@ -6,7 +6,7 @@
 /*   By: slazar <slazar@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 22:27:02 by slazar            #+#    #+#             */
-/*   Updated: 2023/03/10 19:11:10 by slazar           ###   ########.fr       */
+/*   Updated: 2023/03/10 20:28:13 by slazar           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,32 +16,39 @@
 #include <stdlib.h>
 
 
-void    send_char(char c, int PID)
+void    send_char(char *c, int PID)
 {
     int i = 7;
-    while (i >= 0)
+    while (*c)
     {
-        if(c | (1 << i))
+
+        
+        while (i >= 0)
         {
-            kill(PID, SIGUSR1);
-            write(1, "1", 1);
+            if(c | (1 << i))
+            {
+                kill(PID, SIGUSR1);
+                write(1, "1", 1);
+            }
+            else
+            {
+                kill(PID, SIGUSR2);    
+                write(1, "0", 1);
+            }
+            usleep(500);
+            i--;
         }
-        else
-        {
-            kill(PID, SIGUSR2);    
-            write(1, "0", 1);
-        }
-        i--;
-    }
     
+        c++;
+    }
     
 }
 
 int main(int ac, char **av)
 {
-    int PID = ft_atoi(av[1]);
+    int PID = ft_atoi_pid(av[1]);
     char *string = av[2];
 
     printf("SERVER PID = %d\n", PID);
-    send_char('0', PID);
+    send_char(av[2], PID);
 }
