@@ -6,7 +6,7 @@
 /*   By: slazar <slazar@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 17:50:22 by slazar            #+#    #+#             */
-/*   Updated: 2023/03/10 20:13:22 by slazar           ###   ########.fr       */
+/*   Updated: 2023/03/11 16:55:00 by slazar           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,4 @@ int ft_atoi_pid(char *str)
         return (-1);
     }
     return (s);
-}
-int main ()
-{
-printf("%d",ft_atoi_pid("       556   "));
-
 }
