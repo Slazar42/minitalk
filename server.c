@@ -6,7 +6,7 @@
 /*   By: slazar <slazar@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 22:23:38 by slazar            #+#    #+#             */
-/*   Updated: 2023/03/12 23:19:30 by slazar           ###   ########.fr       */
+/*   Updated: 2023/03/13 06:03:30 by slazar           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void putnbr(int nb)
     }
 }
 
-void    hundlilina(int sig)
+void    handler(int sig)
 {
     static char c = 0;
     static int bit = 0;
@@ -59,14 +59,29 @@ void    hundlilina(int sig)
     }
 }
 
-int main()
+int main(int ac, char **av)
 {
     int pid ;
+
+    (void)av;
+    if (ac != 1)
+    {
+        write(1, "\033[91mError: wrong format.\033[0m",25);
+        write(1, "\n", 1);
+		write(1, "\033[33mTry: ./server\033[0m", 18);
+		return (0);
+    }
+    
     pid = getpid();
+    write(1, "\033[94mPID\033[0m \033[96m->\033[0m %d\n", 15);
     putnbr(pid);
-    write(1, "\n----------\n",12);
-    signal(SIGUSR1,hundlilina);
-    signal(SIGUSR2,hundlilina);
-    while (1)
+    write(1, "\033[0mWaiting for a message...\033[0m\n", 31);
+    write(1, "\n", 1);
+
+    while (ac == 1)
+    {
+        signal(SIGUSR1,handler);
+        signal(SIGUSR2,handler);
         pause();
+    }
 }
