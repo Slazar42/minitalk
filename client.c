@@ -6,7 +6,7 @@
 /*   By: slazar <slazar@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 22:27:02 by slazar            #+#    #+#             */
-/*   Updated: 2023/03/13 05:59:00 by slazar           ###   ########.fr       */
+/*   Updated: 2023/03/14 16:47:07 by slazar           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ int ft_atoi_pid(char *str)
     return (s);
 }
 
-void    send_str(char *str, int PID)
+void    send_str(char *str, int pid)
 {
     int bit;
 
@@ -44,10 +44,10 @@ void    send_str(char *str, int PID)
         while (bit < 8)
         {
             if(*str & (1 << bit))
-                kill(PID, SIGUSR1);
+                kill(pid, SIGUSR1);
             else
-                kill(PID, SIGUSR2);    
-            usleep(100);
+                kill(pid, SIGUSR2);    
+            usleep(300);
             bit++;
         }
         str++;
@@ -60,14 +60,15 @@ int main(int ac, char **av)
 
     pid = ft_atoi_pid(av[1]);
     if (pid > 0 && ac == 3 )
+    {
         send_str(av[2], pid);
+        while (*av[2])
+            write(1, av[2]++, 1);
+    }
     else
     {
         write (1, "\033[91mError: wrong format.\033[0m\n", 26);
-        write(1, "\n", 1);
 		write(1, "\033[33mTry: ./client <PID> <MESSAGE>\033[0m\n",35);
     }
     if (ac == 3)
-    while (*av[2])
-        write(1, av[2]++, 1);
 }
