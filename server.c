@@ -6,7 +6,7 @@
 /*   By: slazar <slazar@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 22:23:38 by slazar            #+#    #+#             */
-/*   Updated: 2023/03/16 17:39:31 by slazar           ###   ########.fr       */
+/*   Updated: 2023/03/17 17:15:58 by slazar           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,30 +41,66 @@ void ft_putnbr(int nb)
 
 void    ft_handler(int sig, siginfo_t *i, void *h)
 {
-    static char c;
+    static char c[4];
     static int  bit;
     int static  pid;
     int         new_pid;
+    static int  count;
+    static int  k;
 
     new_pid = i->si_pid;
     if (pid != new_pid)
     {
-        new_pid = pid;
-        c = 0;
+        pid = new_pid;
+        c[count] = 0;
         bit = 0;
     }
     if(sig == SIGUSR1)
     {
-        c = c | (1 << bit);
+        c[count] = c[count] | (1 << bit);
+        if (bit < 4 && bit == k)
+        {
+            //write(1, "1\n", 1);
+            k++;
+            
+        }
         bit++;   
     }
     else if (sig == SIGUSR2)
         bit++;
-    if(bit == 8)
+    //printf("k = %d\n", k);
+    // printf("bit = %d\n", bit);
+    if (bit == 8)
     {
-        write(1, &c, 1);
-        c = 0;
-        bit = 0;
+        if(k == 0)
+        {
+            write(1, &c, 1);
+            c[0] = 0;
+            bit = 0;
+            count = 0;
+            k = 0;
+        } 
+        else
+            count++;  
+    }
+    if (bit == 16)
+    {
+        printf("count : %d\n", count);
+        if(k == 2)
+        {
+            //write(1, "test16 ins\n", 11);
+            write(1, &c, 2);
+            c[0] = 0;
+            c[1] = 0;
+            bit = 0;
+            count = 0;
+            k = 0;
+        } 
+        // else
+        // {
+        //     count++;
+        //     //write(1, "tset16\n", 7);
+        // }
     }
 }
 
