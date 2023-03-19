@@ -6,7 +6,7 @@
 /*   By: slazar <slazar@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 22:23:38 by slazar            #+#    #+#             */
-/*   Updated: 2023/03/17 17:15:58 by slazar           ###   ########.fr       */
+/*   Updated: 2023/03/19 17:15:58 by slazar           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,55 +55,55 @@ void    ft_handler(int sig, siginfo_t *i, void *h)
         c[count] = 0;
         bit = 0;
     }
-    if(sig == SIGUSR1)
+    if (sig == SIGUSR1)
     {
         c[count] = c[count] | (1 << bit);
         if (bit < 4 && bit == k)
-        {
-            //write(1, "1\n", 1);
             k++;
-            
-        }
         bit++;   
     }
     else if (sig == SIGUSR2)
         bit++;
-    //printf("k = %d\n", k);
-    // printf("bit = %d\n", bit);
-    if (bit == 8)
+    if (bit == 32 && k == 4)
     {
-        if(k == 0)
-        {
-            write(1, &c, 1);
-            c[0] = 0;
-            bit = 0;
-            count = 0;
-            k = 0;
-        } 
-        else
-            count++;  
+        write(1, c, 4);
+        // write(1, "2", 1);
+        c[0] = 0;
+        c[1] = 0;
+        c[2] = 0;
+        c[3] = 0;
+        bit = 0;
+        k = 0;
     }
-    if (bit == 16)
+    if (bit == 24 && k == 3)
     {
-        printf("count : %d\n", count);
-        if(k == 2)
-        {
-            //write(1, "test16 ins\n", 11);
-            write(1, &c, 2);
-            c[0] = 0;
-            c[1] = 0;
-            bit = 0;
-            count = 0;
-            k = 0;
-        } 
-        // else
-        // {
-        //     count++;
-        //     //write(1, "tset16\n", 7);
-        // }
+        write(1, c, 3);
+        // write(1, "3", 1);
+        c[0] = 0;
+        c[1] = 0;
+        c[2] = 0;
+        bit = 0;
+        k = 0;
     }
+    if (bit == 16 && k == 2)
+    {
+        write(1,  &c, 2);
+        // write(1, "1", 1);
+        c[0] = 0;
+        c[1] = 0;
+        bit = 0;
+        k = 0;
+    }
+    if (bit == 8 && k == 0)
+    {
+        // write(1, "0", 1);
+        write(1, c, 1);
+        c[0] = 0;
+        bit = 0;
+    }
+    if ((bit == 8 || bit == 16 || bit == 24 || bit == 32) && (k < 4 && k > 1))
+        count++;
 }
-
 int main(int ac, char **av)
 {
     int pid ;
