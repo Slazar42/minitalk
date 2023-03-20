@@ -6,7 +6,7 @@
 /*   By: slazar <slazar@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 22:23:38 by slazar            #+#    #+#             */
-/*   Updated: 2023/03/19 17:15:58 by slazar           ###   ########.fr       */
+/*   Updated: 2023/03/20 19:48:24 by slazar           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <sys/types.h>
-
 
 void ft_putnbr(int nb)
 {
@@ -39,78 +38,47 @@ void ft_putnbr(int nb)
     }
 }
 
-void    ft_handler(int sig, siginfo_t *i, void *h)
+void    ft_handler(int sig, siginfo_t *siga, void *h)
 {
-    static char c[4];
+    static char c;
     static int  bit;
     int static  pid;
     int         new_pid;
-    static int  count;
-    static int  k;
 
-    new_pid = i->si_pid;
+    new_pid = siga->si_pid;
     if (pid != new_pid)
     {
         pid = new_pid;
-        c[count] = 0;
+        c = 0;
         bit = 0;
     }
     if (sig == SIGUSR1)
     {
-        c[count] = c[count] | (1 << bit);
-        if (bit < 4 && bit == k)
-            k++;
-        bit++;   
+        c = c | (1 << bit);
+        bit++;
     }
     else if (sig == SIGUSR2)
         bit++;
-    if (bit == 32 && k == 4)
+    if (bit == 8)
     {
-        write(1, c, 4);
-        // write(1, "2", 1);
-        c[0] = 0;
-        c[1] = 0;
-        c[2] = 0;
-        c[3] = 0;
-        bit = 0;
-        k = 0;
-    }
-    if (bit == 24 && k == 3)
-    {
-        write(1, c, 3);
-        // write(1, "3", 1);
-        c[0] = 0;
-        c[1] = 0;
-        c[2] = 0;
-        bit = 0;
-        k = 0;
-    }
-    if (bit == 16 && k == 2)
-    {
-        write(1,  &c, 2);
-        // write(1, "1", 1);
-        c[0] = 0;
-        c[1] = 0;
-        bit = 0;
-        k = 0;
-    }
-    if (bit == 8 && k == 0)
-    {
-        // write(1, "0", 1);
-        write(1, c, 1);
-        c[0] = 0;
+        if (c == '\0')
+            kill(pid,SIGUSR1);
+        else
+            write(1, &c, 1);
+        c = 0;
         bit = 0;
     }
-    if ((bit == 8 || bit == 16 || bit == 24 || bit == 32) && (k < 4 && k > 1))
-        count++;
 }
 int main(int ac, char **av)
-{
-    int pid ;
-    struct sigaction siga;
+{ 
+    int                 pid ;
+    struct sigaction    siga;
+    int                 error;
+
     
     siga.sa_flags = SA_SIGINFO;
     siga.sa_sigaction = ft_handler;
+    sigemptyset(&siga.sa_mask);
     (void)av;
     if (ac != 1)
     {
@@ -121,9 +89,10 @@ int main(int ac, char **av)
     pid = getpid();
     write(1, "\033[94mPID\033[0m->", 20);
     ft_putnbr(pid);
-    write(1, "\033[86m\nWaiting for a message...\n\033[0m", 38);
-    sigaction(SIGUSR1, &siga, NULL);
-    sigaction(SIGUSR2, &siga, NULL);
+	error = sigaction(SIGUSR1, &siga, NULL);
+	error = sigaction(SIGUSR2, &siga, NULL);
+	if (error != 0)
+		return (1);
     while (ac == 1)
         pause();
 }
