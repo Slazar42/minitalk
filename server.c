@@ -67,13 +67,13 @@ void	accc(int ac)
 	{
 		write(1, "\033[91mError: wrong format.\n\033[0m", 26);
 		write(1, "\033[33mTry: ./server\n\033[0m", 19);
-		exit (1);
+		exit(1);
 	}
 }
 
 int	main(int ac, char **av)
 {
-	int					pid ;
+	int					pid;
 	struct sigaction	siga;
 	int					error;
 
@@ -90,8 +90,8 @@ int	main(int ac, char **av)
 	error = sigaction(SIGUSR2, &siga, NULL);
 	if (error != 0)
 	{
-		write (1, "\033[91mError\n", 11);
-		exit (1);
+		write(1, "\033[91mError\n", 11);
+		exit(1);
 	}
 	while (1)
 		pause();

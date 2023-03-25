@@ -6,11 +6,12 @@
 /*   By: slazar <slazar@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 22:23:38 by slazar            #+#    #+#             */
-/*   Updated: 2023/03/24 18:32:13 by slazar           ###   ########.fr       */
+/*   Updated: 2023/03/25 19:40:31 by slazar           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
+#include "stdio.h"
 
 void	ft_putnbr(int nb)
 {
@@ -32,14 +33,16 @@ void	ft_putnbr(int nb)
 		ft_putnbr(nb % 10);
 	}
 }
-void print_checklast(int *pid, char *c, int *bit)
+
+void	ft_send_signal(int sig, int *bit, char *c)
 {
-	if (c == '\0')
-		kill(*pid, SIGUSR1);
-	else
-		write(1, c, 1);
-	*c = 0;
-	*bit = 0;
+	if (sig == SIGUSR1)
+	{
+		*c = *c | (1 << *bit);
+		*bit = *bit +1;
+	}
+	else if (sig == SIGUSR2)
+		*bit = *bit +1;
 }
 
 void	ft_handler(int sig, siginfo_t *siga, void *h)
@@ -55,16 +58,16 @@ void	ft_handler(int sig, siginfo_t *siga, void *h)
 		c = 0;
 		bit = 0;
 	}
-	if (sig == SIGUSR1)
-	{
-		c = c | (1 << bit);
-		bit++;
-	}
-	else if (sig == SIGUSR2)
-		bit++;
+	ft_send_signal(sig, &bit, &c);
 	if (bit == 8)
-		print_checklast(&pid, &c, &bit);
-	
+	{
+		if (c == '\0')
+			kill(pid, SIGUSR1);
+		else
+			write(1, &c, 1);
+		c = 0;
+		bit = 0;
+	}
 }
 
 void	accc(int ac)
@@ -72,14 +75,14 @@ void	accc(int ac)
 	if (ac != 1)
 	{
 		write(1, "\033[91mError: wrong format.\n\033[0m", 26);
-		write(1, "\033[33mTry: ./server\n\033[0m", 19);
-		exit (1);
+		write(1, "\033[33mTry: ./server_bonus\n\033[0m", 25);
+		exit(1);
 	}
 }
 
 int	main(int ac, char **av)
 {
-	int					pid ;
+	int					pid;
 	struct sigaction	siga;
 	int					error;
 
@@ -96,8 +99,8 @@ int	main(int ac, char **av)
 	error = sigaction(SIGUSR2, &siga, NULL);
 	if (error != 0)
 	{
-		write (1, "\033[91mError\n", 11);
-		exit (0);
+		write(1, "\033[91mError\n", 11);
+		exit(0);
 	}
 	while (ac == 1)
 		pause();

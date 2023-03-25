@@ -67,7 +67,7 @@ int	main(int ac, char **av)
 
 	if (ac != 3)
 	{
-		write (1, "\033[91mError: wrong format.\n", 26);
+		write(1, "\033[91mError: wrong format.\n", 26);
 		write(1, "\033[33mTry: ./client <PID> <MESSAGE>\n\033[0m\n", 36);
 	}
 	else if (ac == 3)
@@ -76,6 +76,6 @@ int	main(int ac, char **av)
 		if (pid > 0)
 			send_str(av[2], pid);
 		else
-			write (1, "\033[91mError Pid\n", 15);
+			write(1, "\033[91mError Pid\n", 15);
 	}
 }
