@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.c                                           :+:      :+:    :+:   */
+/*   server_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: slazar <slazar@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/02 22:23:38 by slazar            #+#    #+#             */
-/*   Updated: 2023/03/24 18:02:46 by slazar           ###   ########.fr       */
+/*   Updated: 2023/03/24 18:32:13 by slazar           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,15 @@ void	ft_putnbr(int nb)
 		ft_putnbr(nb % 10);
 	}
 }
+void print_checklast(int *pid, char *c, int *bit)
+{
+	if (c == '\0')
+		kill(*pid, SIGUSR1);
+	else
+		write(1, c, 1);
+	*c = 0;
+	*bit = 0;
+}
 
 void	ft_handler(int sig, siginfo_t *siga, void *h)
 {
@@ -54,11 +63,8 @@ void	ft_handler(int sig, siginfo_t *siga, void *h)
 	else if (sig == SIGUSR2)
 		bit++;
 	if (bit == 8)
-	{
-		write(1, &c, 1);
-		c = 0;
-		bit = 0;
-	}
+		print_checklast(&pid, &c, &bit);
+	
 }
 
 void	accc(int ac)
@@ -78,10 +84,10 @@ int	main(int ac, char **av)
 	int					error;
 
 	accc(ac);
+	(void)av;
 	siga.sa_flags = SA_SIGINFO;
 	siga.sa_sigaction = ft_handler;
 	sigemptyset(&siga.sa_mask);
-	(void)av;
 	pid = getpid();
 	write(1, "PID->", 5);
 	ft_putnbr(pid);
@@ -91,8 +97,8 @@ int	main(int ac, char **av)
 	if (error != 0)
 	{
 		write (1, "\033[91mError\n", 11);
-		exit (1);
+		exit (0);
 	}
-	while (1)
+	while (ac == 1)
 		pause();
 }
