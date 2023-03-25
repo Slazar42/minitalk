@@ -1,28 +1,37 @@
 
-server = server 
-client = client
-server_bonus = server_bonus
-client_bonus = client_bonus
 
-all: $(server) $(client)
+SRC = server.c client.c
+SRC_BONUS = server_bonus.c client_bonus.c
+OBJ = ${SRC:.c=.o}
+OBJ_BONUS = ${SRC_BONUS:.c=.o}
+CFLAGS = -Wall -Wextra -Werror
 
-bonus:$(server_bonus) $(client_bonus)
+all:server client
+bonus:server_bonus client_bonus
 
-CFLAGC = -Wall -Wextra -Werror
-CC = cc
+client:$(OBJ)
+	cc $(CFLAGS) client.o -o client 
+server:$(OBJ)
+	cc $(CFLAGS) server.o -o server
+client_bonus:$(OBJ_BONUS)
+	cc $(CFLAGS) client_bonus.o -o client_bonus
+server_bonus:$(OBJ_BONUS)
+	cc $(CFLAGS) server_bonus.o -o server_bonus
 
-$(server): minitalk.h server.c
-			$(CC) $(CFLAGS) server.c -o $(server)
-$(client): minitalk.h client.c
-			$(CC) $(CFLAGS) client.c  -o $(client)
-
-$(server_bonus): minitalk.h server_bonus.c
-			$(CC) $(CFLAGS) server_bonus.c  -o $(server_bonus)
-$(client_bonus): minitalk.h client_bonus.c
-			$(CC) $(CFLAGS) client_bonus.c  -o $(client_bonus)
+%.o:%.c
+	cc $(CFLAGS) $^ -c
 
 clean:
-	rm -rf $(c_obj) 
-fclean: clean
-	rm -rf $(client) $(server) $(client_bonus) $(server_bonus)
-re: fclean all
+	rm -f $(OBJ)
+clean_bonus:
+	rm -f $(OBJ_BONUS)
+
+fclean:clean
+	rm -f server client
+fclean_bonus:clean_bonus
+	rm -f server_bonus client_bonus
+
+re:fclean server client
+re_bonus:fclean_bonus server_bonus client_bonus
+
+.PHONY :clean fclean
